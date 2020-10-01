@@ -19,6 +19,9 @@ async function dbAuthentication() {
   try {
     await sequelize.authenticate();
     console.log("Successfull DB connection");
+
+    //await sequelize.sync({ force: true }); // ????
+
   } catch (err) {
 
   }
