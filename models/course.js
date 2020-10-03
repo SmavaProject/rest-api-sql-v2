@@ -1,4 +1,6 @@
 'use strict';
+const Sequelize = require('sequelize');
+
 const {
   Model
 } = require('sequelize');
@@ -14,13 +16,27 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Course.init({
-    title: DataTypes.STRING,
-    description: DataTypes.TEXT,
+    title: {
+      type: Sequelize.STRING,
+      validate: {
+        notEmpty: {
+          msg: "'Title' is required"
+        }
+      }
+    },
+    description: {
+          type: Sequelize.STRING,
+          validate: {
+            notEmpty: {
+              msg: "'Description' is required"
+            }
+          }
+        },
     estimatedTime: {
       type: DataTypes.STRING,
       allowNull: true
     },
-    materialsNeeded:  {
+    materialsNeeded: {
       type: DataTypes.STRING,
       allowNull: true
     },

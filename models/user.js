@@ -1,4 +1,6 @@
 'use strict';
+const Sequelize = require('sequelize');
+
 const {
   Model
 } = require('sequelize');
@@ -14,10 +16,38 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   User.init({
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    emailAddress: DataTypes.STRING,
-    password: DataTypes.STRING
+    firstName: {
+      type: Sequelize.STRING,
+      validate: {
+        notEmpty: {
+          msg: "'FirstName' is required"
+        }
+      }
+    },
+    lastName: {
+      type: Sequelize.STRING,
+      validate: {
+        notEmpty: {
+          msg: "'LastName' is required"
+        }
+      }
+    },
+    emailAddress: {
+      type: Sequelize.STRING,
+      validate: {
+        notEmpty: {
+          msg: "'EmailAddress' is required"
+        }
+      }
+    },
+    password: {
+      type: Sequelize.STRING,
+      validate: {
+        notEmpty: {
+          msg: "'Password' is required"
+        }
+      }
+    }
   }, {
     sequelize,
     modelName: 'User',

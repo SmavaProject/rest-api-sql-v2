@@ -30,6 +30,10 @@ dbAuthentication();
 
 // TODO setup your api routes here
 
+const router = require('./routes/routes');
+
+app.use('/api', router);
+
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
   res.json({

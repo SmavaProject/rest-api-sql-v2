@@ -4,6 +4,12 @@
     <list default="true" id="6577efb1-eb38-49a8-9f6b-be099dd0aee6" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/course.js" beforeDir="false" afterPath="$PROJECT_DIR$/models/course.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/user.js" beforeDir="false" afterPath="$PROJECT_DIR$/models/user.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/courseRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/courseRoutes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/userRoutes.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/userRoutes.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +51,9 @@
       <updated>1601092236430</updated>
       <workItem from="1601092238258" duration="261000" />
       <workItem from="1601474750671" duration="1982000" />
-      <workItem from="1601490471711" duration="2178000" />
+      <workItem from="1601490471711" duration="5492000" />
+      <workItem from="1601716938214" duration="3430000" />
+      <workItem from="1601749051552" duration="2847000" />
     </task>
     <servers />
   </component>
@@ -53,9 +61,13 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="621" y="314" key="com.intellij.ide.util.TipDialog" timestamp="1601490486465">
+    <state x="755" y="137" key="#com.intellij.unscramble.UnscrambleDialog" timestamp="1601749594086">
       <screen x="0" y="23" width="1680" height="947" />
     </state>
-    <state x="621" y="314" key="com.intellij.ide.util.TipDialog/0.23.1680.947@0.23.1680.947" timestamp="1601490486465" />
+    <state x="755" y="137" key="#com.intellij.unscramble.UnscrambleDialog/0.23.1680.947@0.23.1680.947" timestamp="1601749594086" />
+    <state x="621" y="314" key="com.intellij.ide.util.TipDialog" timestamp="1601749052087">
+      <screen x="0" y="23" width="1680" height="947" />
+    </state>
+    <state x="621" y="314" key="com.intellij.ide.util.TipDialog/0.23.1680.947@0.23.1680.947" timestamp="1601749052087" />
   </component>
 </project>
