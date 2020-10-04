@@ -19,24 +19,73 @@ function asyncHandler(cb){
     }
 };
 
-const authenticateUser = async(req, res, next) => {
-    try {
+const authenticateUser = async (req, res, next) => {
+    let message = null;
 
-    } catch (error) {
-        throw error;
+    //get credentials from Authorization header
+    const credentials = auth(req);
+
+    if (credentials) {
+        // getting all users from the DB and finding one which has the credentials from header
+
+        const users = await User.findAll();
+        const user = users.find(user => user.emailAddress === credentials.name);
+
+        if (user) {
+            // compare password from the header and from the DB
+            const authenticated = bcryptjs.compareSync(credentials.pass, user.password);
+
+            // If the passwords match...
+            if (authenticated) {
+                console.log(`Authentication successful for username: ${user.firstName} ${user.lastName}`);
+
+                // Then store the retrieved user object on the request object
+                // so any middleware functions that follow this middleware function
+                // will have access to the user's information.
+                req.currentUser = user;
+            } else {
+                message = `Authentication failure for username: ${user.firstName} ${user.lastName}`;
+            }
+        } else {
+            message = `User not found for username: ${credentials.name}`;
+        }
+    } else {
+        message = 'Auth header not found';
+    }
+
+    // If user authentication failed...
+    if (message) {
+        console.warn(message);
+
+        // Return a response with a 401 Unauthorized HTTP status code.
+        res.status(401).json({ message: 'Access Denied' });
+    } else {
+        // Or if user authentication succeeded...
+        // Call the next() method.
+        next();
     }
 };
+
+
+/***************
+** USER ROUTES **
+ ***************/
 
 /*
 Returns the currently authenticated user
 GET /api/users 200
  */
 router.get('/users', authenticateUser, asyncHandler(async (req, res, next) => {
-    const users = await User.findAll().then(function(users){
-        console.log(users);
-        res.json(users);
-        res.status(200).end();
-    });
+    const currentUser = req.currentUser;
+    if (currentUser){
+        res.json({
+            firstName: authedUser.firstName,
+            lastName: authedUser.lastName,
+            emailAddress: authedUser.emailAddress
+        });
+    }else{
+        res.status(404);
+    }
 }));
 
 
@@ -76,9 +125,9 @@ router.post('/users', [
 }));
 
 
-/*
-Course routes
- */
+/*****************
+** COURSE ROUTES **
+ *****************/
 
 
 /* GET all courses
