@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   Course.init({
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
     title: {
       type: Sequelize.STRING,
       validate: {
@@ -46,6 +51,7 @@ module.exports = (sequelize, DataTypes) => {
   });
   Course.associate = (models) => {
     Course.belongsTo(models.User, {
+      as: 'user',
       foreignKey: {
         fieldName: 'userId',
       },

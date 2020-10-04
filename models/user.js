@@ -16,6 +16,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   User.init({
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     firstName: {
       type: Sequelize.STRING,
       validate: {
@@ -55,8 +60,10 @@ module.exports = (sequelize, DataTypes) => {
 
   User.associate = (models) => {
     User.hasMany(models.Course, {
+      as: 'user',
       foreignKey: {
         fieldName: 'userId',
+        allowNull: 'false'
       },
     });
   };

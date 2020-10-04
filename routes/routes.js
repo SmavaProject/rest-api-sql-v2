@@ -76,16 +76,21 @@ Returns the currently authenticated user
 GET /api/users 200
  */
 router.get('/users', authenticateUser, asyncHandler(async (req, res, next) => {
-    const currentUser = req.currentUser;
-    if (currentUser){
-        res.json({
-            id: authedUser.id,
-            firstName: authedUser.firstName,
-            lastName: authedUser.lastName,
-            emailAddress: authedUser.emailAddress
-        });
-    }else{
-        res.status(404);
+    try {
+        const currentUser = req.currentUser;
+        console.log(currentUser);
+        if (currentUser) {
+            res.json({
+                id: currentUser.id,
+                firstName: currentUser.firstName,
+                lastName: currentUser.lastName,
+                emailAddress: currentUser.emailAddress
+            });
+        } else {
+            res.status(404);
+        }
+    }catch (error){
+        console.log(error);
     }
 }));
 
@@ -97,7 +102,7 @@ POST /api/users 201
 
 router.post('/users', [
     check('firstName')
-        .exists({ checkNull: true, checkFalsy: true })
+        .exists()
         .withMessage('Please provide a value for "firstName"'),
     check('lastName')
         .exists({ checkNull: true, checkFalsy: true })
@@ -110,8 +115,9 @@ router.post('/users', [
         .withMessage('Please provide a value for "password"'),
 ], asyncHandler(async (req, res, next) => {
     try {
+        console.log(req.body);
         const errors = validationResult(req);
-
+        console.log(errors);
         if (!errors.isEmpty()) {
             // Use the Array `map()` method to get a list of error messages.
             const errorMessages = errors.array().map(error => error.msg);
@@ -123,6 +129,7 @@ router.post('/users', [
 
             //check whether it is a new user or whether such email address already exists in the DB
             const allUsers = await User.findAll({attributes: ["emailAddress"], raw: true});
+            console.log(allUsers);
             const allUserEmails = allUsers.map(user => user.emailAddress);
             const emailOfCurrentUser = allUserEmails.find(email => email === currentUser.emailAddress);
 
@@ -151,15 +158,19 @@ router.post('/users', [
  GET /api/courses 200
  */
 router.get('/courses', asyncHandler(async (req, res, next) => {
-    const courses = await Course.findAll({
-        include: {
-            model: User,
-            as: "user",
-            attributes: ["id", "firstName", "lastName", "emailAddress"]
-        },
-        attributes: { exclude: ['createdAt', 'updatedAt'] }
-    });
-    res.json(courses);
+    try {
+        const courses = await Course.findAll({
+            include: {
+                model: User,
+                as: "user",
+                attributes: ["id", "firstName", "lastName", "emailAddress"]
+            },
+            attributes: {exclude: ['createdAt', 'updatedAt']}
+        });
+        res.json(courses);
+    }catch (error){
+        console.log(error);
+    }
 }));
 
 /*
@@ -167,31 +178,33 @@ Return the course for the provided ID
 GET /api/courses/:id 200
  */
 router.get('/courses/:id', asyncHandler(async (req, res, next) => {
+    try {
+        const courses = await Course.findAll({ // Course.findByPk -????
+            include: {
+                model: User,
+                as: "user",
+                attributes: ["id", "firstName", "lastName", "emailAddress"]
+            },
+            attributes: {exclude: ['createdAt', 'updatedAt']}
+        });
 
+        const id = req.params.id;
+        const course = courses.find(course => course.id == id);
+        if (course) {
+            res.json(course);
+        } else {
+            res.status(400).json({message: 'Course with such id is not found'});
+        }
+    }catch (error){
+        console.log(error);
+    }
 }));
 
 /*
 Creates a new course
 POST /api/courses 201
  */
-/*
-router.post('/',  [
-    check("title")
-        .exists()
-        .withMessage("Please provide value from 'title'"),
-    check("description")
-        .exists()
-        .withMessage("Please provide value for 'description'"),
-    check("userId")
-        .exists()
-        .withMessage("Please provide value for 'userId'")
-], userRoutes.authenticateUser, asyncHandler(async (req, res, next) => {
 
-}));
-*/
-
-
-//POST /COURSES
 router.post('/courses', [
     check("title")
         .exists()
@@ -202,29 +215,75 @@ router.post('/courses', [
     check("userId")
         .exists()
         .withMessage("Please provide value for 'userId'")
-], authenticateUser, asyncHandler(async(req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        const errorMessages = errors.array().map(error => error.msg);
-        return res.status(400).json({ errors: errorMessages });
-    };
-    const course = req.body;
-//ADD COURSE TO DATABASE
-    const newCourse = await Course.create(course);
-    const courseId = newCourse.dataValues.id;
-//STATUS 201
-    res.status(201).location(`/courses/${courseId}`).end();
+], authenticateUser, asyncHandler(async(req, res, next) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const errorMessages = errors.array().map(error => error.msg);
+            return res.status(400).json({errors: errorMessages});
+        }
+        //adding course to the DB
+        const newCourse = await Course.create(req.body);
+        const courseId = newCourse.dataValues.id;
+
+        res.status(201).location(`/courses/${courseId}`).end();
+    }catch (error){
+        console.log(error);
+    }
 }));
+
 /*
 Updates a course
 PUT /api/courses/:id 204
  */
-router.put('/courses/:id');
+router.put('/courses/:id', [
+    check("title")
+        .exists()
+        .withMessage("Please provide value from 'title'"),
+    check("description")
+        .exists()
+        .withMessage("Please provide value for 'description'")
+], authenticateUser, asyncHandler(async(req, res, next) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const errorMessages = errors.array().map(error => error.msg);
+            return res.status(400).json({errors: errorMessages});
+        }
+
+        const user = req.currentUser;
+        const course = await Course.findByPk(req.params.id);
+
+        if (user.id == course.userId) {
+            await course.update(req.body);
+            res.sendStatus(204);
+        } else {
+            res.status(401).json({ message: 'Access Denied' });
+        }
+    }catch (error){
+        console.log(error);
+    }
+}));
 
 /*
 delete the course with a provided ID
 DELETE /api/courses/:id 204
  */
-router.delete('courses/:id');
+router.delete('courses/:id', authenticateUser, asyncHandler(async(req, res, next) => {
+    try {
+
+        const user = req.currentUser;
+        const course = await Course.findByPk(req.params.id);
+
+        if (user.id == course.userId) {
+            await course.destroy();
+            res.sendStatus(204);
+        } else {
+            res.status(401).json({ message: 'Access Denied' });
+        }
+    }catch (error){
+        console.log(error);
+    }
+}));
 
 module.exports = router;
