@@ -79,6 +79,7 @@ router.get('/users', authenticateUser, asyncHandler(async (req, res, next) => {
     const currentUser = req.currentUser;
     if (currentUser){
         res.json({
+            id: authedUser.id,
             firstName: authedUser.firstName,
             lastName: authedUser.lastName,
             emailAddress: authedUser.emailAddress
@@ -108,19 +109,35 @@ router.post('/users', [
         .exists({ checkNull: true, checkFalsy: true })
         .withMessage('Please provide a value for "password"'),
 ], asyncHandler(async (req, res, next) => {
+    try {
+        const errors = validationResult(req);
 
-    const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            // Use the Array `map()` method to get a list of error messages.
+            const errorMessages = errors.array().map(error => error.msg);
 
-    if (!errors.isEmpty()) {
-        // Use the Array `map()` method to get a list of error messages.
-        const errorMessages = errors.array().map(error => error.msg);
+            // Return the validation errors to the client.
+            return res.status(400).json({errors: errorMessages});
+        } else {
+            const currentUser = req.body;
 
-        // Return the validation errors to the client.
-        return res.status(400).json({ errors: errorMessages });
-    }else {
-        const user = req.body;
-        //user = await User.create(req.body);
-        res.status(201).end();
+            //check whether it is a new user or whether such email address already exists in the DB
+            const allUsers = await User.findAll({attributes: ["emailAddress"], raw: true});
+            const allUserEmails = allUsers.map(user => user.emailAddress);
+            const emailOfCurrentUser = allUserEmails.find(email => email === currentUser.emailAddress);
+
+            if (currentUser.emailAddress === emailOfCurrentUser) {
+                return res.status(400).json({error: "User with such email address already saved in the database"});
+            }
+
+            //hashing the password
+            currentUser.password = bcryptjs.hashSync(currentUser.password);
+            //saving user to the DB
+            await User.create(currentUser); //req.body
+            res.status(201).location(`/`).end();
+        }
+    } catch (error){
+        console.log(error);
     }
 }));
 
@@ -134,10 +151,15 @@ router.post('/users', [
  GET /api/courses 200
  */
 router.get('/courses', asyncHandler(async (req, res, next) => {
-    const courses = await Course.findAll().then(function(courses){
-        console.log(courses);
-        res.json(courses);
+    const courses = await Course.findAll({
+        include: {
+            model: User,
+            as: "user",
+            attributes: ["id", "firstName", "lastName", "emailAddress"]
+        },
+        attributes: { exclude: ['createdAt', 'updatedAt'] }
     });
+    res.json(courses);
 }));
 
 /*
@@ -189,7 +211,7 @@ router.post('/courses', [
     const course = req.body;
 //ADD COURSE TO DATABASE
     const newCourse = await Course.create(course);
-    const courseId = newCourse.dataValues.id
+    const courseId = newCourse.dataValues.id;
 //STATUS 201
     res.status(201).location(`/courses/${courseId}`).end();
 }));
