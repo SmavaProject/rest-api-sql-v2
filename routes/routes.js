@@ -110,6 +110,9 @@ router.post('/users', [
     check('emailAddress')
         .exists({ checkNull: true, checkFalsy: true })
         .withMessage('Please provide a value for "emailAddress"'),
+    check('emailAddress')
+        .isEmail()
+        .withMessage('Please a valid email address'),
     check('password')
         .exists({ checkNull: true, checkFalsy: true })
         .withMessage('Please provide a value for "password"'),
