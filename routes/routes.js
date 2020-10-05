@@ -235,27 +235,33 @@ PUT /api/courses/:id 204
  */
 router.put('/courses/:id', [
     check("title")
-        .exists()
+        .exists({ checkNull: true, checkFalsy: true })
         .withMessage("Please provide value from 'title'"),
     check("description")
-        .exists()
+        .exists({ checkNull: true, checkFalsy: true })
         .withMessage("Please provide value for 'description'")
 ], authenticateUser, asyncHandler(async(req, res, next) => {
     try {
         const errors = validationResult(req);
+        console.log(errors);
         if (!errors.isEmpty()) {
             const errorMessages = errors.array().map(error => error.msg);
             return res.status(400).json({errors: errorMessages});
         }
 
         const user = req.currentUser;
-        const course = await Course.findByPk(req.params.id);
+        const courseID = req.params.id;
+        const course = await Course.findByPk(courseID);
 
-        if (user.id == course.userId) {
-            await course.update(req.body);
-            res.sendStatus(204);
-        } else {
-            res.status(401).json({ message: 'Access Denied' });
+        if (course) { //make sure that the course is found
+            if (user.id == course.userId) {
+                await course.update(req.body);
+                res.sendStatus(204);
+            } else {
+                res.status(401).json({message: 'Access Denied'});
+            }
+        }else{
+            res.status(400).json({message: `Course ID ${courseID} is not found`});
         }
     }catch (error){
         console.log(error);
