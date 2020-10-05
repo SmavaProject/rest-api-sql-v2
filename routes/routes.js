@@ -119,10 +119,7 @@ router.post('/users', [
         const errors = validationResult(req);
         console.log(errors);
         if (!errors.isEmpty()) {
-            // Use the Array `map()` method to get a list of error messages.
             const errorMessages = errors.array().map(error => error.msg);
-
-            // Return the validation errors to the client.
             return res.status(400).json({errors: errorMessages});
         } else {
             const currentUser = req.body;
@@ -269,9 +266,8 @@ router.put('/courses/:id', [
 delete the course with a provided ID
 DELETE /api/courses/:id 204
  */
-router.delete('courses/:id', authenticateUser, asyncHandler(async(req, res, next) => {
+router.delete('/courses/:id', authenticateUser, asyncHandler(async(req, res, next) => {
     try {
-
         const user = req.currentUser;
         const course = await Course.findByPk(req.params.id);
 

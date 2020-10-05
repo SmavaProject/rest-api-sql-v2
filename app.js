@@ -4,6 +4,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const { sequelize } = require('./models');
+const bodyParser = require('body-parser');
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -29,7 +30,7 @@ async function dbAuthentication() {
 dbAuthentication();
 
 // TODO setup your api routes here
-
+app.use(bodyParser.json());
 const router = require('./routes/routes');
 
 app.use('/api', router);
