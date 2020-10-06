@@ -24,7 +24,7 @@ async function dbAuthentication() {
     //await sequelize.sync({ force: true }); // ????
 
   } catch (err) {
-
+    console.log("An error has happened while connecting to the DB");
   }
 }
 dbAuthentication();

@@ -193,7 +193,7 @@ router.get('/courses/:id', asyncHandler(async (req, res, next) => {
         if (course) {
             res.json(course);
         } else {
-            res.status(400).json({message: 'Course with such id is not found'});
+            res.status(400).json({message: `Course ID ${id} is not found`});
         }
     }catch (error){
         console.log(error);
@@ -261,7 +261,7 @@ router.put('/courses/:id', [
                 await course.update(req.body);
                 res.sendStatus(204);
             } else {
-                res.status(401).json({message: 'Access Denied'});
+                res.status(403).json({message: 'Access Denied'});
             }
         }else{
             res.status(400).json({message: `Course ID ${courseID} is not found`});
@@ -284,7 +284,7 @@ router.delete('/courses/:id', authenticateUser, asyncHandler(async(req, res, nex
             await course.destroy();
             res.sendStatus(204);
         } else {
-            res.status(401).json({ message: 'Access Denied' });
+            res.status(403).json({ message: 'Access Denied' });
         }
     }catch (error){
         console.log(error);
